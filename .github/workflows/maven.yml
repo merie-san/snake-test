@@ -16,19 +16,18 @@ on:
 jobs:
     build:
     # Each job needs a runner given by the corresponding virtual environment
-        runs-on: ${{matrix.os}}
+        runs-on: ubuntu-latest
         strategy:
            matrix:
-              additional-maven-args: "-Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN"
-              os: ubuntu-latest
               java: [8,11]
+              additional-maven-args: '-Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN'
         # A job consists in an ordered list pof steps, executed in the same runner
         # They can directly run commands, but this depends on the OS of the runner
         # We can instead use an action
         steps:
               # This action clones the github repository on the runner
             - uses: actions/checkout@v2
-            - name: Set up JDK £{{matrix.java}} on ${{matrix.os}}
+            - name: Set up JDK £{{matrix.java}} on ubuntu-latest
               # This action installs a spoecific version of the Java JDK on the runner
               uses: actions/setup-java@v1
               with:
@@ -37,13 +36,12 @@ jobs:
               uses: actions/cache@v2
               with:
                 path: ~/.m2
-                key: ${{runner.os}}-m2-jdk${{matrix.java}}-${{hashFiles('**/pom.xml', '**/*.yml')}}
-                restore-keys: ${{runner.os}}-m2-
-              with:
+                key: $jdk${{matrix.java}}-${{hashFiles('**/pom.xml', '**/*.yml')}}
+                restore-keys: ${{matrix.java}}-m2-
             - name: Build with Maven
               run: mvn clean verify ${{matrix.additional-maven-args}}
               env: 
-                 COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_TOKEN}}
+                 COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_REPO_TOKEN}}
               if: ${{always()}}
             - name: Archive JUnit Report
               if: ${{always()}}
