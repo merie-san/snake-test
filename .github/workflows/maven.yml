@@ -32,7 +32,7 @@ jobs:
               with:
                   java-version: ${{matrix.java}}
             - name: Cache Maven packages
-              uses: actions/cache@v2
+              uses: actions/cache@v3
               with:
                 path: ~/.m2
                 key: $jdk${{matrix.java}}-${{hashFiles('**/pom.xml', '**/*.yml')}}
@@ -44,7 +44,7 @@ jobs:
               if: ${{always()}}
             - name: Archive JUnit Report
               if: ${{always()}}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v3
               with:
                  name: surefire-report-jdk-${{matrix.java}}
                  path: '**/target/site'
