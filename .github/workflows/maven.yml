@@ -20,7 +20,6 @@ jobs:
         strategy:
            matrix:
               java: [8,11]
-              additional-maven-args: ['-Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN']
         # A job consists in an ordered list pof steps, executed in the same runner
         # They can directly run commands, but this depends on the OS of the runner
         # We can instead use an action
@@ -33,13 +32,13 @@ jobs:
               with:
                   java-version: ${{matrix.java}}
             - name: Cache Maven packages
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                 path: ~/.m2
                 key: $jdk${{matrix.java}}-${{hashFiles('**/pom.xml', '**/*.yml')}}
                 restore-keys: ${{matrix.java}}-m2-
             - name: Build with Maven
-              run: mvn clean verify ${{matrix.additional-maven-args}}
+              run: 'mvn clean verify -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN'
               env: 
                  COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_REPO_TOKEN}}
               if: ${{always()}}
