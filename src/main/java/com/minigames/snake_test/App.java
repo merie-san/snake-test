@@ -5,6 +5,6 @@ package com.minigames.snake_test;
  */
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+    	// TODO implement main logic 
     }
 }
