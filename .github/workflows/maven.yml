@@ -17,6 +17,7 @@ jobs:
     build:
     # Each job needs a runner given by the corresponding virtual environment
         runs-on: ${{matrix.os}}
+        environment: env
         strategy:
            matrix:
               os: [windows-latest, ubuntu-latest]
@@ -37,14 +38,8 @@ jobs:
                 path: ~/.m2
                 key: ${{matrix.os}}-m2-${{hashFiles('**/pom.xml', '**/*.yml')}}
                 restore-keys: ${{matrix.os}}-m2-
-            - name: Debug Print token length
-              run: echo "Token length is ${#COVERALLS_REPO_TOKEN}"
-              env:
-                COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_REPO_TOKEN}}
             - name: Build with Maven
-              run: "mvn clean verify -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN"
-              env: 
-                 COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_REPO_TOKEN}}
+              run: mvn clean verify -Pcoveralls -DrepoToken=${{secrets.COVERALLS_REPO_TOKEN}}
               if: ${{always()}}
             - name: Archive JUnit Report
               if: ${{always()}}
