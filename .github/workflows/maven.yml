@@ -16,18 +16,44 @@ on:
 jobs:
     build:
     # Each job needs a runner given by the corresponding virtual environment
-        runs-on: ubuntu-latest
+        runs-on: ${{matrix.os}}
+        strategy:
+           matrix:
+              additional-maven-args: "-Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN"
+              os: [ubuntu-latest, macos-latest, windows-latest]
+              java: [8,11]
+              exclude:
+              - os: macos-latest
+                java: 11
+              - os: windows-latest
+                java: 11
         # A job consists in an ordered list pof steps, executed in the same runner
         # They can directly run commands, but this depends on the OS of the runner
         # We can instead use an action
         steps:
               # This action clones the github repository on the runner
             - uses: actions/checkout@v2
-            - name: Set up JDK 11
+            - name: Set up JDK £{{matrix.java}} on ${{matrix.os}}
               # This action installs a spoecific version of the Java JDK on the runner
               uses: actions/setup-java@v1
               with:
-                  java-version: 11
+                  java-version: ${{matrix.java}}
+            - name: Cache Maven packages
+              uses: actions/cache@v2
+              with:
+                path: ~/.m2
+                key: ${{runner.os}}-m2-jdk${{matrix.java}}-${{hashFiles('**/pom.xml', '**/*.yml')}}
+                restore-keys: ${{runner.os}}-m2-
+              with:
             - name: Build with Maven
-              run: mvn clean verify
+              run: mvn clean verify ${{matrix.additional-maven-args}}
+              env: 
+                 COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_TOKEN}}
+              if: ${{always()}}
+            - name: Archive JUnit Report
+              if: ${{always()}}
+              uses: actions/upload-artifact@v2
+              with:
+                 name: surefire-report-jdk-${{matrix.java}}
+                 path: '**/target/site'
 
