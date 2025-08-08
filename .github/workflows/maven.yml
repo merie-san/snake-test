@@ -16,27 +16,27 @@ on:
 jobs:
     build:
     # Each job needs a runner given by the corresponding virtual environment
-        runs-on: ubuntu-latest
+        runs-on: ${{matrix.os}}
         strategy:
            matrix:
-              java: [8,11]
+              os: [windows-latest, ubuntu-latest]
         # A job consists in an ordered list pof steps, executed in the same runner
         # They can directly run commands, but this depends on the OS of the runner
         # We can instead use an action
         steps:
               # This action clones the github repository on the runner
             - uses: actions/checkout@v2
-            - name: Set up JDK £{{matrix.java}} on ubuntu-latest
+            - name: Set up JDK 11 on ubuntu-latest
               # This action installs a spoecific version of the Java JDK on the runner
               uses: actions/setup-java@v1
               with:
-                  java-version: ${{matrix.java}}
+                  java-version: 11
             - name: Cache Maven packages
               uses: actions/cache@v3
               with:
                 path: ~/.m2
-                key: $jdk${{matrix.java}}-${{hashFiles('**/pom.xml', '**/*.yml')}}
-                restore-keys: ${{matrix.java}}-m2-
+                key: ${{matrix.os}}-m2-${{hashFiles('**/pom.xml', '**/*.yml')}}
+                restore-keys: ${{matrix.os}}-m2-
             - name: Build with Maven
               run: 'mvn clean verify -Pcoveralls -DrepoToken=$COVERALLS_REPO_TOKEN'
               env: 
@@ -46,6 +46,6 @@ jobs:
               if: ${{always()}}
               uses: actions/upload-artifact@v4
               with:
-                 name: surefire-report-jdk-${{matrix.java}}
+                 name: surefire-report-jdk-${{matrix.os}}
                  path: '**/target/site'
 
