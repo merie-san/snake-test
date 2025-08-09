@@ -1,2 +1,2 @@
-## Test project for course of AST (Automated Software Testing)
+## Test project for course of AST (Automated Software Testing) [![Java CI with Maven and Linux](https://github.com/merie-san/snake-test/actions/workflows/maven.yml/badge.svg)](https://github.com/merie-san/snake-test/actions/workflows/maven.yml) [![Coverage Status](https://coveralls.io/repos/github/merie-san/snake-test/badge.svg?branch=master)](https://coveralls.io/github/merie-san/snake-test?branch=master)
 the snake game is not actually implemented here.
